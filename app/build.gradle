@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 28
     defaultConfig {
-        applicationId "com.gotobus"
+        applicationId "com.gotobus.driver"
         minSdkVersion 14
         targetSdkVersion 28
         versionCode 1
@@ -33,4 +33,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-places:16.0.0'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
     implementation 'com.amitshekhar.android:android-networking:1.0.2'
+    implementation 'com.github.woxthebox:draglistview:1.6.3'
 }
