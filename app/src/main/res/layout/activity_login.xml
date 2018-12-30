@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.gotobus.LoginActivity"
+    android:background="#ffffff">
+
+    <ImageView
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo"/>
+
+    <TextView
+        android:textSize="17sp"
+        android:id="@+id/signup"
+        android:textColor="#0000ff"
+        android:gravity="center"
+        android:padding="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Create Account"/>
+
+    <Button
+        android:id="@+id/login"
+        android:layout_above="@+id/signup"
+        android:textColor="#FFF"
+        android:background="@drawable/orange_button"
+        android:text="LOGIN"
+        android:layout_centerHorizontal="true"
+        android:layout_width="350dp"
+        android:layout_height="60dp" />
+
+    <EditText
+        android:id="@+id/phone"
+        android:inputType="phone"
+        android:layout_above="@+id/login"
+        android:padding="10dp"
+        android:layout_marginBottom="40dp"
+        android:layout_centerHorizontal="true"
+        android:hint="Phone Number"
+        android:layout_width="350dp"
+        android:layout_height="70dp" />
+
+</RelativeLayout>

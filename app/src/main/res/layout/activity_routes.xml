@@ -10,30 +10,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="EDIT ROUTE"
+        android:text="ROUTES"
         android:textStyle="bold"
         android:padding="15dp"/>
 
-    <com.woxthebox.draglistview.DragListView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_below="@+id/title"
-        android:id="@+id/drag_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </com.woxthebox.draglistview.DragListView>
-
-    <android.support.design.widget.FloatingActionButton
-        android:visibility="visible"
-        android:id="@+id/add_more"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:src="@drawable/ic_add_black_24dp"
-        android:layout_marginBottom="90dp"
-        android:layout_alignParentRight="true" />
+    </android.support.v7.widget.RecyclerView>
 
     <android.support.design.widget.FloatingActionButton
         android:visibility="visible"
@@ -44,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_check_black_24dp"
+        android:src="@drawable/ic_add_black_24dp"
         android:layout_alignParentRight="true" />
 
 </RelativeLayout>
