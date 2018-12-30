@@ -129,9 +129,12 @@ public class AddRouteActivity extends AppCompatActivity {
                                     timePicker.setMinute(Integer.parseInt(departureTime[1]));
                                     timePicker.setVisibility(View.VISIBLE);
                                     mItemArray.add((new RouteWaypoint(i++, data.get("source").toString(), data.get("sourceLatLong").toString())));
-                                    String[] waypoints = data.get("waypoints").toString().split("\\|");
-                                    for (int j=0; j<waypoints.length; j++) {
-                                        mItemArray.add(new RouteWaypoint(i++, waypoints[j], ""));
+                                    String waypointsString = data.get("waypoints").toString();
+                                    if (waypointsString.length()>0) {
+                                        String[] waypoints = data.get("waypoints").toString().split("\\|");
+                                        for (int j = 0; j < waypoints.length; j++) {
+                                            mItemArray.add(new RouteWaypoint(i++, waypoints[j], ""));
+                                        }
                                     }
                                     mItemArray.add((new RouteWaypoint(i++, data.get("destination").toString(), data.get("destinationLatLong").toString())));
                                 } else {
@@ -174,8 +177,8 @@ public class AddRouteActivity extends AppCompatActivity {
             public void onClick(View view) {
                 source = mItemArray.get(0).name;
                 destination = mItemArray.get(mItemArray.size()-1).name;
-                sourceLatLong = mItemArray.get(0).latLong;
-                destinationLatLong = mItemArray.get(mItemArray.size()-1).latLong;
+//                sourceLatLong = mItemArray.get(0).latLong;
+//                destinationLatLong = mItemArray.get(mItemArray.size()-1).latLong;
                 departure_time = String.valueOf(timePicker.getHour()) + ":" + String.valueOf(timePicker.getMinute());
 
                 waypoints = "";
@@ -186,10 +189,10 @@ public class AddRouteActivity extends AppCompatActivity {
                 }
 
                 // Origin of route
-                String str_origin = "origin=" + sourceLatLong;
+                String str_origin = "origin=" + source;
 
                 // Destination of route
-                String str_dest = "destination=" + destinationLatLong;
+                String str_dest = "destination=" + destination;
 
                 // Sensor enabled
                 String sensor = "sensor=false";
@@ -219,6 +222,11 @@ public class AddRouteActivity extends AppCompatActivity {
                                     if (result.length()>0) {
                                         JSONObject route = result.getJSONObject(0);
                                         JSONArray legs = route.getJSONArray("legs");
+
+                                        sourceLatLong = legs.getJSONObject(0).getJSONObject("start_location").get("lat").toString() + "," + legs.getJSONObject(0).getJSONObject("start_location").get("lng").toString();
+
+                                        destinationLatLong = legs.getJSONObject(legs.length()-1).getJSONObject("end_location").get("lat").toString() + "," + legs.getJSONObject(legs.length()-1).getJSONObject("end_location").get("lng").toString();
+
                                         for (int i=0; i<legs.length(); i++) {
                                             JSONObject leg = legs.getJSONObject(i);
                                             JSONArray steps = leg.getJSONArray("steps");

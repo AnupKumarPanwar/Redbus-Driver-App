@@ -1,6 +1,7 @@
 package com.gotobus;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Address;
@@ -26,8 +27,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -38,6 +43,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -88,6 +94,12 @@ public class MainActivity extends AppCompatActivity
 
     boolean tripStarted = false;
 
+    int routeId = -1;
+    String baseUrl;
+    SharedPreferences sharedPreferences;
+    String PREFS_NAME = "MyApp_Settings";
+    String accessToken;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +124,10 @@ public class MainActivity extends AppCompatActivity
 
         // Construct a FusedLocationProviderClient.
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        baseUrl = getResources().getString(R.string.base_url);
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        accessToken = sharedPreferences.getString("access_token", null);
 
         AndroidNetworking.initialize(getApplicationContext());
 
@@ -237,6 +253,67 @@ public class MainActivity extends AppCompatActivity
         updateLocationUI();
         getDeviceLocation();
 
+        if (getIntent().getExtras()!=null) {
+            routeId = getIntent().getExtras().getInt("route_id", -1);
+        }
+
+        if (routeId != -1) {
+            AndroidNetworking.post(baseUrl + "/getRoute.php")
+                    .setOkHttpClient(NetworkCookies.okHttpClient)
+                    .addHeaders("Authorization", accessToken)
+                    .addBodyParameter("route_id", String.valueOf(routeId))
+                    .setPriority(Priority.MEDIUM)
+                    .build()
+                    .getAsJSONObject(new JSONObjectRequestListener() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                JSONObject result = response.getJSONObject("result");
+                                boolean success = Boolean.parseBoolean(result.get("success").toString());
+                                if (success) {
+                                    JSONObject data = result.getJSONObject("data");
+                                    sourceAddress.setText(data.get("source").toString());
+                                    destinationAddress.setText(data.get("destination").toString());
+
+                                    String[] sourceLatLong = data.get("sourceLatLong").toString().split(",");
+                                    String[] destinationLatLong = data.get("destinationLatLong").toString().split(",");
+                                    LatLng origin = new LatLng(Double.parseDouble(sourceLatLong[0]), Double.parseDouble(sourceLatLong[1]));
+                                    LatLng destination = new LatLng(Double.parseDouble(destinationLatLong[0]), Double.parseDouble(destinationLatLong[1]));
+                                    String waypoints = data.get("waypoints").toString();
+
+                                    sourceMarkerOption = new MarkerOptions()
+                                            .position(origin)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
+                                    mMap.addMarker(sourceMarkerOption);
+
+                                    destinationMarkerOption = new MarkerOptions()
+                                            .position(destination)
+                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
+                                    mMap.addMarker(destinationMarkerOption);
+
+                                    String url = getDirectionsUrl(origin, destination, waypoints);
+
+                                    DownloadTask downloadTask = new DownloadTask();
+
+                                    // Start downloading json data from Google Directions API
+                                    downloadTask.execute(url);
+                                } else {
+                                    String message = result.get("message").toString();
+                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                                }
+                            }
+                            catch (Exception e) {
+                                Log.d("onResponse", e.getMessage());
+                            }
+                        }
+
+
+                        @Override
+                        public void onError(ANError anError) {
+
+                        }
+                    });
+        }
 //        // Add a marker in Sydney and move the camera
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
@@ -324,10 +401,10 @@ public class MainActivity extends AppCompatActivity
                             // Set the map's camera position to the current location of the device.
                             mLastKnownLocation = task.getResult();
 
-                            sourceMarkerOption = new MarkerOptions()
-                                    .position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()))
-                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
-                            mMap.addMarker(sourceMarkerOption);
+//                            sourceMarkerOption = new MarkerOptions()
+//                                    .position(new LatLng(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude()))
+//                                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
+//                            mMap.addMarker(sourceMarkerOption);
 
                             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                                     new LatLng(mLastKnownLocation.getLatitude(),
@@ -446,7 +523,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+    private String getDirectionsUrl(LatLng origin, LatLng dest, String waypoints) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -463,7 +540,7 @@ public class MainActivity extends AppCompatActivity
         // Building the parameters to the web service
         String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + apiKey + "&" + callback;
 
-//        parameters += "&waypoints=30.6775, 76.8115| 30.6864, 76.7986| 30.7055, 76.8013";
+        parameters += "&waypoints=" + waypoints;
         // Output format
         String output = "json";
 

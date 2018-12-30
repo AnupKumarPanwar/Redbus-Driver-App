@@ -52,6 +52,19 @@ class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.MyViewHolder> {
                 context.startActivity(intent);
             }
         });
+
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, MainActivity.class);
+                intent.putExtra("route_id", busRoutes.get(i).id);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(intent);
+            }
+        };
+
+        myViewHolder.source.setOnClickListener(onClickListener);
+        myViewHolder.destination.setOnClickListener(onClickListener);
     }
 
     @Override
