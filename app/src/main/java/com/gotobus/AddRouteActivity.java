@@ -235,6 +235,7 @@ public class AddRouteActivity extends AppCompatActivity {
                                                 JSONObject startLocation = step.getJSONObject("start_location");
                                                 JSONObject endLocation = step.getJSONObject("end_location");
                                                 waypointsLatLong = waypointsLatLong + startLocation.get("lat") + "," + startLocation.get("lng");
+                                                waypointsLatLong = waypointsLatLong + "|";
                                                 waypointsLatLong = waypointsLatLong + endLocation.get("lat") + "," + endLocation.get("lng");
                                                 waypointsLatLong = waypointsLatLong + "|";
                                             }
