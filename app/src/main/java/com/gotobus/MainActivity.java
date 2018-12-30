@@ -361,23 +361,23 @@ public class MainActivity extends AppCompatActivity
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
 
-                mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
-                    @Override
-                    public boolean onMyLocationButtonClick() {
-                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                        try{
-                            List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
-                            Address address = addresses.get(0);
-                            String currentAddress = address.getAddressLine(0);
-                            sourceAddress.setText(currentAddress);
-                        }
-                        catch (Exception e) {
-                            Log.e("Exception", e.getMessage());
-                        }
-
-                        return false;
-                    }
-                });
+//                mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+//                    @Override
+//                    public boolean onMyLocationButtonClick() {
+//                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+//                        try{
+//                            List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
+//                            Address address = addresses.get(0);
+//                            String currentAddress = address.getAddressLine(0);
+//                            sourceAddress.setText(currentAddress);
+//                        }
+//                        catch (Exception e) {
+//                            Log.e("Exception", e.getMessage());
+//                        }
+//
+//                        return false;
+//                    }
+//                });
 
             } else {
                 mMap.setMyLocationEnabled(false);
@@ -410,12 +410,12 @@ public class MainActivity extends AppCompatActivity
                                     new LatLng(mLastKnownLocation.getLatitude(),
                                             mLastKnownLocation
                                                     .getLongitude()), DEFAULT_ZOOM));
-                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+//                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
                             try{
-                                List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
-                                Address address = addresses.get(0);
-                                String currentAddress = address.getAddressLine(0);
-                                sourceAddress.setText(currentAddress);
+//                                List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
+//                                Address address = addresses.get(0);
+//                                String currentAddress = address.getAddressLine(0);
+//                                sourceAddress.setText(currentAddress);
                             }
                             catch (Exception e) {
                                 Log.e("Exception", e.getMessage());
