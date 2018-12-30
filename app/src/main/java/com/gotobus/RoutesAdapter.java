@@ -32,13 +32,22 @@ class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.MyViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
+    public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, final int i) {
         myViewHolder.source.setText(busRoutes.get(i).source);
         myViewHolder.destination.setText(busRoutes.get(i).destination);
+        String[] departureTime = busRoutes.get(i).departureTime.split(":");
+        if (departureTime[0].length()==1) {
+            departureTime[0] = "0" + departureTime[0];
+        }
+        if (departureTime[1].length()==1) {
+            departureTime[1] = "0" + departureTime[1];
+        }
+        myViewHolder.departureTime.setText(departureTime[0] + ":" + departureTime[1]);
         myViewHolder.editRoute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, AddRouteActivity.class);
+                intent.putExtra("route_id", busRoutes.get(i).id);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
@@ -51,13 +60,14 @@ class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.MyViewHolder> {
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView source, destination;
+        TextView source, destination, departureTime;
         ImageView editRoute;
         public MyViewHolder(View itemView) {
             super(itemView);
             source = itemView.findViewById(R.id.source);
             destination = itemView.findViewById(R.id.destination);
             editRoute = itemView.findViewById(R.id.edit_route);
+            departureTime = itemView.findViewById(R.id.departure_time);
         }
     }
 }

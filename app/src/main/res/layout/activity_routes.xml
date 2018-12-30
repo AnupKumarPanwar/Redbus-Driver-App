@@ -18,9 +18,27 @@
         android:id="@+id/recycler_view"
         android:layout_below="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
     </android.support.v7.widget.RecyclerView>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_below="@+id/recycler_view"
+        android:layout_marginTop="20dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/no_routes_available"
+        android:visibility="gone"
+        android:gravity="center"
+        android:layout_below="@+id/recycler_view"
+        android:padding="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No routes available."/>
 
     <android.support.design.widget.FloatingActionButton
         android:visibility="visible"

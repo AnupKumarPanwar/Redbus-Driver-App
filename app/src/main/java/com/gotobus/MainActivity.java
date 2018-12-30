@@ -84,7 +84,9 @@ public class MainActivity extends AppCompatActivity
 
     EditText sourceAddress, destinationAddress;
 
-    LinearLayout container;
+    LinearLayout container, nextPassengerContainer;
+
+    boolean tripStarted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,78 +118,30 @@ public class MainActivity extends AppCompatActivity
         container = findViewById(R.id.container);
         container.requestFocus();
 
+        nextPassengerContainer = findViewById(R.id.next_passenger_container);
+
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
 
-        sourceAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                    startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_SOURCE);
-                } catch (GooglePlayServicesRepairableException e) {
-                    Log.e("Exception", e.getMessage());
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    Log.e("Exception", e.getMessage());
-                }
-            }
-        });
 
-        sourceAddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (b) {
-                    try {
-                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                        startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_SOURCE);
-                    } catch (GooglePlayServicesRepairableException e) {
-                        Log.e("Exception", e.getMessage());
-                    } catch (GooglePlayServicesNotAvailableException e) {
-                        Log.e("Exception", e.getMessage());
-                    }
-                }
-            }
-        });
-
-
-
-        destinationAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                    startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_DESTINATION);
-                } catch (GooglePlayServicesRepairableException e) {
-                    Log.e("Exception", e.getMessage());
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    Log.e("Exception", e.getMessage());
-                }
-            }
-        });
-
-        destinationAddress.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (b) {
-                    try {
-                        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                        startActivityForResult(builder.build(MainActivity.this), AUTOCOMPLETE_DESTINATION);
-                    } catch (GooglePlayServicesRepairableException e) {
-                        Log.e("Exception", e.getMessage());
-                    } catch (GooglePlayServicesNotAvailableException e) {
-                        Log.e("Exception", e.getMessage());
-                    }
-                }
-            }
-        });
-
-
-        FloatingActionButton fab = findViewById(R.id.fab);
+        final FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (!tripStarted) {
+                    Snackbar.make(view, "Trip started", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_black_24dp));
+                    nextPassengerContainer.setVisibility(View.VISIBLE);
+                    tripStarted = true;
+                }
+                else {
+                    Snackbar.make(view, "Trip completed", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
+                    nextPassengerContainer.setVisibility(View.GONE);
+                    tripStarted = false;
+                }
             }
         });
 
@@ -203,76 +157,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == AUTOCOMPLETE_SOURCE) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(getApplicationContext(), data);
-                sourceAddress.setText(place.getAddress());
-
-                mMap.clear();
-
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(place.getLatLng())
-                        .zoom(DEFAULT_ZOOM)
-                        .build();
-
-                sourceMarkerOption = new MarkerOptions()
-                        .position(place.getLatLng())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
-
-                mMap.addMarker(sourceMarkerOption);
-
-                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-                if (destinationMarkerOption!=null) {
-                    mMap.addMarker(destinationMarkerOption);
-                    // Getting URL to the Google Directions API
-                    LatLng origin = sourceMarkerOption.getPosition();
-                    LatLng dest = destinationMarkerOption.getPosition();
-
-                    try {
-                        String url = getDirectionsUrl(origin, dest);
-                        DownloadTask downloadTask = new DownloadTask();
-                        downloadTask.execute(url);
-                    }
-                    catch (Exception e) {
-                        Log.d("Route exception" , e.getMessage());
-                    }
-                }
-            }
-        }
-        else if (requestCode == AUTOCOMPLETE_DESTINATION) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(getApplicationContext(), data);
-                destinationAddress.setText(place.getAddress());
-
-                mMap.clear();
-
-                destinationMarkerOption = new MarkerOptions()
-                        .position(place.getLatLng())
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
-
-                mMap.addMarker(destinationMarkerOption);
-
-                if (sourceMarkerOption!=null) {
-                    mMap.addMarker(sourceMarkerOption);
-                    // Getting URL to the Google Directions API
-                    LatLng origin = sourceMarkerOption.getPosition();
-                    LatLng dest = destinationMarkerOption.getPosition();
-
-                    try {
-                        String url = getDirectionsUrl(origin, dest);
-                        DownloadTask downloadTask = new DownloadTask();
-                        downloadTask.execute(url);
-                    }
-                    catch (Exception e) {
-                        Log.d("Route exception" , e.getMessage());
-                    }
-                }
-            }
-        }
-    }
 
     @Override
     public void onBackPressed() {

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout
-    android:layout_marginBottom="20dp"
+    android:layout_marginBottom="30dp"
     android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,6 +14,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="#000"/>
+
+        <TextView
+            android:id="@+id/departure_time"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:paddingLeft="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="05: 00"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -74,7 +91,7 @@
         android:src="@drawable/ic_edit_black_24dp"
         android:id="@+id/edit_route"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_width="24dp"
         android:layout_height="24dp" />

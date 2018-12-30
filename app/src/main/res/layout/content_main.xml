@@ -85,6 +85,8 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/next_passenger_container"
+        android:visibility="gone"
         android:gravity="center"
         android:background="#FFF"
         android:layout_alignParentBottom="true"
@@ -97,7 +99,7 @@
             android:layout_width="match_parent"
             android:layout_height="90dp"
             android:orientation="horizontal"
-            android:weightSum="3">
+            android:weightSum="5">
 
             <LinearLayout
                 android:clickable="true"
@@ -110,32 +112,11 @@
                 android:padding="5dp"
                 android:orientation="vertical">
 
-                <TextView
-                    android:paddingBottom="3dp"
-                    android:text="Rs. 1000"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
-
-                <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:layout_width="30dp"-->
-                    <!--android:layout_height="30dp"-->
-                    <!--android:src="@drawable/sleeper"-->
-                    <!--app:civ_border_width="2dp"-->
-                    <!--app:civ_border_color="#FF000000"/>-->
 
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/sleeper" />
-
-                <TextView
-                    android:paddingTop="3dp"
-                    android:text="SLEEPER"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_call_black_24dp" />
 
             </LinearLayout>
 
@@ -144,80 +125,28 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
                 android:gravity="center"
-                android:layout_weight="1"
+                android:layout_weight="4"
                 android:layout_width="0dp"
                 android:layout_height="90dp"
                 android:padding="5dp"
                 android:orientation="vertical">
 
                 <TextView
+                    android:textStyle="bold"
                     android:paddingBottom="3dp"
-                    android:text="Rs. 2000"
+                    android:text="No awaiting passenger"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:layout_height="wrap_content"/>
 
-                <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:layout_width="30dp"-->
-                    <!--android:layout_height="30dp"-->
-                    <!--android:src="@drawable/ac"-->
-                    <!--app:civ_border_width="2dp"-->
-                    <!--app:civ_border_color="#FF000000"/>-->
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/ac" />
 
                 <TextView
                     android:paddingTop="3dp"
-                    android:text="AC"
+                    android:text="Pickup location of next passenger will appear here"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:clickable="true"
-                android:focusable="true"
-                android:background="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="90dp"
-                android:padding="5dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:paddingBottom="3dp"
-                    android:text="Rs. 5000"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
-
-                <!--<de.hdodenhof.circleimageview.CircleImageView-->
-                    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-                    <!--android:layout_width="30dp"-->
-                    <!--android:layout_height="30dp"-->
-                    <!--android:src="@drawable/volvo"-->
-                    <!--app:civ_border_width="2dp"-->
-                    <!--app:civ_border_color="#FF000000"/>-->
-
-                <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:src="@drawable/volvo" />
-
-                <TextView
-                    android:paddingTop="3dp"
-                    android:text="VOLVO"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"/>
-
-            </LinearLayout>
 
         </LinearLayout>
 
