@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity
     SharedPreferences sharedPreferences;
     String PREFS_NAME = "MyApp_Settings";
     String accessToken;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity
 
         baseUrl = getResources().getString(R.string.base_url);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         accessToken = sharedPreferences.getString("access_token", null);
 
         AndroidNetworking.initialize(getApplicationContext());
@@ -299,6 +301,13 @@ public class MainActivity extends AppCompatActivity
                                     downloadTask.execute(url);
                                 } else {
                                     String message = result.get("message").toString();
+                                    if (message.equals("Invalid access token.")) {
+                                        editor.putString("access_token", null);
+                                        editor.commit();
+                                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
                                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                 }
                             }
