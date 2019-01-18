@@ -8,5 +8,5 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_maps">Map</string>
     <string name="google_maps_key">AIzaSyCbo4fTS6ifQ7MRBa0D87jhVEN1qzZJc60</string>
-    <string name="base_url">http://192.168.43.203/goto_server_php/driver</string>
+    <string name="base_url">http://68.183.82.58/GoTo-Server/driver/</string>
 </resources>
