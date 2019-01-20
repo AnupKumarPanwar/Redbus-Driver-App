@@ -9,6 +9,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -101,6 +102,10 @@ public class MainActivity extends AppCompatActivity
     String accessToken;
     SharedPreferences.Editor editor;
 
+    Handler handler;
+    Runnable updateBusLocationRunnable;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,6 +146,17 @@ public class MainActivity extends AppCompatActivity
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
 
+        handler = new Handler();
+        updateBusLocationRunnable = new Runnable() {
+            @Override
+            public void run() {
+                updateBusLocation();
+                if (tripStarted) {
+                    handler.postDelayed(this, 12000);
+                }
+            }
+        };
+
 
         final FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -152,12 +168,14 @@ public class MainActivity extends AppCompatActivity
                     fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_black_24dp));
                     nextPassengerContainer.setVisibility(View.VISIBLE);
                     tripStarted = true;
+                    handler.postDelayed(updateBusLocationRunnable, 12000);
                 } else {
                     Snackbar.make(view, "Trip completed", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                     fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
                     nextPassengerContainer.setVisibility(View.GONE);
                     tripStarted = false;
+                    handler.removeCallbacksAndMessages(null);
                 }
             }
         });
@@ -172,6 +190,48 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    private void updateBusLocation() {
+
+        try {
+            if (mLocationPermissionGranted) {
+                Task<Location> locationResult = mFusedLocationProviderClient.getLastLocation();
+                locationResult.addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // Set the map's camera position to the current location of the device.
+                            mLastKnownLocation = task.getResult();
+
+                        } else {
+                        }
+                    }
+                });
+            }
+        } catch (SecurityException e) {
+            Log.e("Exception: %s", e.getMessage());
+        }
+
+        AndroidNetworking.post(baseUrl + "/updateLatLong.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("last_location", String.valueOf(mLastKnownLocation.getLatitude())+","+String.valueOf(mLastKnownLocation.getLongitude()))
+                .addBodyParameter("bearing", String.valueOf(mLastKnownLocation.getBearing()))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+//                        Toast.makeText(getApplicationContext(), response.toString(), Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+//                        Toast.makeText(getApplicationContext(), anError.toString(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
 
