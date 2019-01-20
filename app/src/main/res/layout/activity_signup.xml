@@ -27,7 +27,7 @@
 
         <EditText
             android:id="@+id/phone"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
             android:hint="Phone Number"
@@ -35,7 +35,7 @@
 
         <EditText
             android:id="@+id/name"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
             android:hint="Bus Service Name"
@@ -43,7 +43,7 @@
 
         <EditText
             android:id="@+id/email"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
             android:hint="Email"
@@ -51,7 +51,7 @@
 
         <EditText
             android:id="@+id/bus_number"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
             android:hint="Bus Number"
@@ -60,14 +60,14 @@
 
         <!--<EditText-->
         <!--android:id="@+id/bus_type"-->
-        <!--android:layout_width="350dp"-->
+        <!--android:layout_width="320dp"-->
         <!--android:layout_height="50dp"-->
         <!--android:layout_marginBottom="40dp"-->
         <!--android:hint="Bus Type"/>-->
 
         <Spinner
             android:id="@+id/bus_type"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginBottom="40dp"
             android:hint="Bus Type"
@@ -77,7 +77,7 @@
 
         <Button
             android:id="@+id/signup"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="60dp"
             android:layout_centerHorizontal="true"
             android:background="@drawable/orange_button"

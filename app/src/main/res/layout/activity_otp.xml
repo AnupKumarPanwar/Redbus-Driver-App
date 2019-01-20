@@ -27,7 +27,7 @@
 
         <EditText
             android:id="@+id/otp"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="50dp"
             android:layout_marginBottom="80dp"
             android:hint="OTP"
@@ -36,7 +36,7 @@
 
         <Button
             android:id="@+id/verify"
-            android:layout_width="350dp"
+            android:layout_width="320dp"
             android:layout_height="60dp"
             android:layout_centerHorizontal="true"
             android:background="@drawable/orange_button"

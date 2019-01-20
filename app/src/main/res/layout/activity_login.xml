@@ -28,7 +28,7 @@
 
     <Button
         android:id="@+id/login"
-        android:layout_width="350dp"
+        android:layout_width="320dp"
         android:layout_height="60dp"
         android:layout_above="@+id/signup"
         android:layout_centerHorizontal="true"
@@ -38,7 +38,7 @@
 
     <EditText
         android:id="@+id/phone"
-        android:layout_width="350dp"
+        android:layout_width="320dp"
         android:layout_height="70dp"
         android:layout_above="@+id/login"
         android:layout_centerHorizontal="true"
