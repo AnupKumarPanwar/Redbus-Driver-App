@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity
 
     MarkerOptions sourceMarkerOption, destinationMarkerOption;
 
-    int AUTOCOMPLETE_SOURCE = 1, AUTOCOMPLETE_DESTINATION=2 ;
+    int AUTOCOMPLETE_SOURCE = 1, AUTOCOMPLETE_DESTINATION = 2;
 
     EditText sourceAddress, destinationAddress;
 
@@ -152,8 +152,7 @@ public class MainActivity extends AppCompatActivity
                     fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_black_24dp));
                     nextPassengerContainer.setVisibility(View.VISIBLE);
                     tripStarted = true;
-                }
-                else {
+                } else {
                     Snackbar.make(view, "Trip completed", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                     fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
@@ -249,13 +248,13 @@ public class MainActivity extends AppCompatActivity
 //        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.style_json));
 
         mMap.setBuildingsEnabled(true);
-        
+
         // Prompt the user for permission.
         getLocationPermission();
         updateLocationUI();
         getDeviceLocation();
 
-        if (getIntent().getExtras()!=null) {
+        if (getIntent().getExtras() != null) {
             routeId = getIntent().getExtras().getInt("route_id", -1);
         }
 
@@ -310,8 +309,7 @@ public class MainActivity extends AppCompatActivity
                                     }
                                     Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
                                 }
-                            }
-                            catch (Exception e) {
+                            } catch (Exception e) {
                                 Log.d("onResponse", e.getMessage());
                             }
                         }
@@ -339,8 +337,7 @@ public class MainActivity extends AppCompatActivity
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                         PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.d("getLocationPermission", e.getMessage());
             }
         }
@@ -394,7 +391,7 @@ public class MainActivity extends AppCompatActivity
                 mLastKnownLocation = null;
                 getLocationPermission();
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -420,13 +417,12 @@ public class MainActivity extends AppCompatActivity
                                             mLastKnownLocation
                                                     .getLongitude()), DEFAULT_ZOOM));
 //                            Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                            try{
+                            try {
 //                                List<Address> addresses = geocoder.getFromLocation(mLastKnownLocation.getLatitude(), mLastKnownLocation.getLongitude(), 1);
 //                                Address address = addresses.get(0);
 //                                String currentAddress = address.getAddressLine(0);
 //                                sourceAddress.setText(currentAddress);
-                            }
-                            catch (Exception e) {
+                            } catch (Exception e) {
                                 Log.e("Exception", e.getMessage());
                             }
                         } else {
@@ -437,7 +433,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
             }
-        } catch (SecurityException e)  {
+        } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
     }
@@ -525,8 +521,7 @@ public class MainActivity extends AppCompatActivity
 // Drawing polyline in the Google Map for the i-th route
             try {
                 mMap.addPolyline(lineOptions);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Log.d("Polyline", e.getMessage());
             }
         }

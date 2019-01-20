@@ -44,7 +44,7 @@ public class AddRouteActivity extends AppCompatActivity {
 
     ArrayList<RouteWaypoint> mItemArray;
     int AUTOCOMPLETE_WAYPOINT = 1;
-    long i=0;
+    long i = 0;
     ItemAdapter listAdapter;
     int routeId = -1;
     TextView activityTitle;
@@ -73,7 +73,7 @@ public class AddRouteActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         accessToken = sharedPreferences.getString("access_token", null);
 
-        progressDialog=new ProgressDialog(this);
+        progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Fetching routes...");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(true);
@@ -110,7 +110,7 @@ public class AddRouteActivity extends AppCompatActivity {
         timePicker = findViewById(R.id.route_time);
 
         activityTitle = findViewById(R.id.title);
-        if (getIntent().getExtras()!=null) {
+        if (getIntent().getExtras() != null) {
             routeId = getIntent().getExtras().getInt("route_id", -1);
         }
 
@@ -139,7 +139,7 @@ public class AddRouteActivity extends AppCompatActivity {
                                     timePicker.setVisibility(View.VISIBLE);
                                     mItemArray.add((new RouteWaypoint(i++, data.get("source").toString(), data.get("sourceLatLong").toString())));
                                     String waypointsString = data.get("waypoints").toString();
-                                    if (waypointsString.length()>0) {
+                                    if (waypointsString.length() > 0) {
                                         String[] waypoints = data.get("waypoints").toString().split("\\|");
                                         for (int j = 0; j < waypoints.length; j++) {
                                             mItemArray.add(new RouteWaypoint(i++, waypoints[j], ""));
@@ -187,7 +187,7 @@ public class AddRouteActivity extends AppCompatActivity {
                 progressDialog.setMessage("Saving route...");
                 progressDialog.show();
                 source = mItemArray.get(0).name;
-                destination = mItemArray.get(mItemArray.size()-1).name;
+                destination = mItemArray.get(mItemArray.size() - 1).name;
 //                sourceLatLong = mItemArray.get(0).latLong;
 //                destinationLatLong = mItemArray.get(mItemArray.size()-1).latLong;
                 departure_time = String.valueOf(timePicker.getHour()) + ":" + String.valueOf(timePicker.getMinute());
@@ -195,7 +195,7 @@ public class AddRouteActivity extends AppCompatActivity {
                 waypoints = "";
                 waypointsLatLong = "";
 
-                for (int i = 1; i<mItemArray.size()-1; i++) {
+                for (int i = 1; i < mItemArray.size() - 1; i++) {
                     waypoints = waypoints + mItemArray.get(i).name + "|";
                 }
 
@@ -214,7 +214,7 @@ public class AddRouteActivity extends AppCompatActivity {
                 // Building the parameters to the web service
                 String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + mode + "&" + apiKey + "&" + callback;
 
-                parameters += "&waypoints="+waypoints;
+                parameters += "&waypoints=" + waypoints;
                 // Output format
                 String output = "json";
 
@@ -230,18 +230,18 @@ public class AddRouteActivity extends AppCompatActivity {
                             public void onResponse(JSONObject response) {
                                 try {
                                     JSONArray result = response.getJSONArray("routes");
-                                    if (result.length()>0) {
+                                    if (result.length() > 0) {
                                         JSONObject route = result.getJSONObject(0);
                                         JSONArray legs = route.getJSONArray("legs");
 
                                         sourceLatLong = legs.getJSONObject(0).getJSONObject("start_location").get("lat").toString() + "," + legs.getJSONObject(0).getJSONObject("start_location").get("lng").toString();
 
-                                        destinationLatLong = legs.getJSONObject(legs.length()-1).getJSONObject("end_location").get("lat").toString() + "," + legs.getJSONObject(legs.length()-1).getJSONObject("end_location").get("lng").toString();
+                                        destinationLatLong = legs.getJSONObject(legs.length() - 1).getJSONObject("end_location").get("lat").toString() + "," + legs.getJSONObject(legs.length() - 1).getJSONObject("end_location").get("lng").toString();
 
-                                        for (int i=0; i<legs.length(); i++) {
+                                        for (int i = 0; i < legs.length(); i++) {
                                             JSONObject leg = legs.getJSONObject(i);
                                             JSONArray steps = leg.getJSONArray("steps");
-                                            for (int j=0; j<steps.length(); j++) {
+                                            for (int j = 0; j < steps.length(); j++) {
                                                 JSONObject step = steps.getJSONObject(j);
                                                 JSONObject startLocation = step.getJSONObject("start_location");
                                                 JSONObject endLocation = step.getJSONObject("end_location");
@@ -253,7 +253,7 @@ public class AddRouteActivity extends AppCompatActivity {
                                         }
 
 
-                                        if (routeId!=-1) {
+                                        if (routeId != -1) {
                                             AndroidNetworking.post(baseUrl + "/editRoute.php")
                                                     .setOkHttpClient(NetworkCookies.okHttpClient)
                                                     .addHeaders("Authorization", accessToken)
@@ -288,12 +288,11 @@ public class AddRouteActivity extends AppCompatActivity {
 
                                                         @Override
                                                         public void onError(ANError error) {
-                                    Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
-                                    progressDialog.hide();
+                                                            Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                                            progressDialog.hide();
                                                         }
                                                     });
-                                        }
-                                        else {
+                                        } else {
                                             AndroidNetworking.post(baseUrl + "/addRoute.php")
                                                     .setOkHttpClient(NetworkCookies.okHttpClient)
                                                     .addHeaders("Authorization", accessToken)
@@ -358,7 +357,7 @@ public class AddRouteActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(getApplicationContext(), data);
 //                Toast.makeText(getApplicationContext(), place.getLatLng().toString(),Toast.LENGTH_LONG).show();
-                mItemArray.add(new RouteWaypoint(i++, place.getAddress().toString(), place.getLatLng().latitude+","+place.getLatLng().longitude));
+                mItemArray.add(new RouteWaypoint(i++, place.getAddress().toString(), place.getLatLng().latitude + "," + place.getLatLng().longitude));
                 listAdapter.notifyDataSetChanged();
             }
         }

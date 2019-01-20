@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <TextView
-        android:textSize="25sp"
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:padding="15dp"
         android:text="ROUTES"
-        android:textStyle="bold"
-        android:padding="15dp"/>
+        android:textSize="25sp"
+        android:textStyle="bold" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler_view"
-        android:layout_below="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/title">
 
     </android.support.v7.widget.RecyclerView>
 
     <ProgressBar
         android:id="@+id/progress_bar"
-        android:layout_below="@+id/recycler_view"
-        android:layout_marginTop="20dp"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_below="@+id/recycler_view"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp" />
 
     <TextView
         android:id="@+id/no_routes_available"
-        android:visibility="gone"
-        android:gravity="center"
-        android:layout_below="@+id/recycler_view"
-        android:padding="15dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No routes available."/>
+        android:layout_below="@+id/recycler_view"
+        android:gravity="center"
+        android:padding="15dp"
+        android:text="No routes available."
+        android:visibility="gone" />
 
     <android.support.design.widget.FloatingActionButton
-        android:visibility="visible"
         android:id="@+id/fab"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_add_black_24dp"
-        android:layout_alignParentRight="true" />
+        android:visibility="visible" />
 
 </RelativeLayout>

@@ -1,71 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.gotobus.SignupActivity"
-    >
+    tools:context="com.gotobus.SignupActivity">
 
     <TextView
-        android:layout_alignParentTop="true"
-        android:textSize="25sp"
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:gravity="center"
+        android:padding="15dp"
         android:text="SIGNUP"
-        android:textStyle="bold"
-        android:padding="15dp"/>
-    
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
     <LinearLayout
-        android:gravity="center"
-        android:layout_below="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="15dp"
-        android:orientation="vertical">
+        android:layout_below="@+id/title"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="15dp">
 
         <EditText
-            android:inputType="phone"
             android:id="@+id/phone"
             android:layout_width="350dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
-            android:hint="Phone Number"/>
+            android:hint="Phone Number"
+            android:inputType="phone" />
 
         <EditText
-            android:inputType="textPersonName"
             android:id="@+id/name"
             android:layout_width="350dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
-            android:hint="Bus Service Name"/>
+            android:hint="Bus Service Name"
+            android:inputType="textPersonName" />
 
         <EditText
-            android:inputType="textEmailAddress"
             android:id="@+id/email"
             android:layout_width="350dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
-            android:hint="Email"/>
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
 
         <EditText
-            android:inputType="textUri"
             android:id="@+id/bus_number"
             android:layout_width="350dp"
             android:layout_height="50dp"
             android:layout_marginBottom="20dp"
-            android:hint="Bus Number"/>
+            android:hint="Bus Number"
+            android:inputType="textUri" />
 
 
         <!--<EditText-->
-            <!--android:id="@+id/bus_type"-->
-            <!--android:layout_width="350dp"-->
-            <!--android:layout_height="50dp"-->
-            <!--android:layout_marginBottom="40dp"-->
-            <!--android:hint="Bus Type"/>-->
+        <!--android:id="@+id/bus_type"-->
+        <!--android:layout_width="350dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_marginBottom="40dp"-->
+        <!--android:hint="Bus Type"/>-->
 
         <Spinner
             android:id="@+id/bus_type"
@@ -79,16 +77,14 @@
 
         <Button
             android:id="@+id/signup"
-            android:textColor="#FFF"
+            android:layout_width="350dp"
+            android:layout_height="60dp"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/orange_button"
             android:text="SIGNUP"
-            android:layout_centerHorizontal="true"
-            android:layout_width="350dp"
-            android:layout_height="60dp" />
+            android:textColor="#FFF" />
 
     </LinearLayout>
-    
-    
-    
-    
+
+
 </RelativeLayout>

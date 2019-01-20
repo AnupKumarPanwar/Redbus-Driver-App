@@ -62,8 +62,8 @@ public class RoutesActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               Intent intent = new Intent(getApplicationContext(), AddRouteActivity.class);
-               startActivity(intent);
+                Intent intent = new Intent(getApplicationContext(), AddRouteActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -82,12 +82,12 @@ public class RoutesActivity extends AppCompatActivity {
                             if (success) {
                                 progressBar.setVisibility(View.GONE);
                                 JSONArray data = result.getJSONArray("data");
-                                if (data.length()==0) {
+                                if (data.length() == 0) {
                                     noRoutesAvailable.setVisibility(View.VISIBLE);
                                 }
-                                for (int i = 0; i<data.length(); i++) {
+                                for (int i = 0; i < data.length(); i++) {
                                     JSONObject route = data.getJSONObject(i);
-                                            busRoutes.add(new BusRoute(Integer.parseInt(route.get("id").toString()), route.get("source").toString(), route.get("destination").toString(), route.get("sourceLatLong").toString(), route.get("destinationLatLong").toString(), route.get("departure_time").toString()));
+                                    busRoutes.add(new BusRoute(Integer.parseInt(route.get("id").toString()), route.get("source").toString(), route.get("destination").toString(), route.get("sourceLatLong").toString(), route.get("destinationLatLong").toString(), route.get("departure_time").toString()));
                                 }
                             } else {
                                 String message = result.get("message").toString();

@@ -2,7 +2,7 @@ package com.gotobus;
 
 class BusRoute {
     int id;
-    String source, destination,  sourceLatLong, destinationLatLong, departureTime;
+    String source, destination, sourceLatLong, destinationLatLong, departureTime;
 
     public BusRoute(int id, String source, String destination, String sourceLatLong, String destinationLatLong, String departureTime) {
         this.id = id;

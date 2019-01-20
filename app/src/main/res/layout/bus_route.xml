@@ -1,99 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-    android:layout_marginBottom="30dp"
-    android:gravity="center"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:layout_marginBottom="30dp"
+    android:gravity="center">
 
-    <LinearLayout android:id="@+id/container"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        xmlns:android="http://schemas.android.com/apk/res/android">
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:orientation="vertical">
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="#000"/>
+            android:background="#000" />
 
         <TextView
             android:id="@+id/departure_time"
-            android:textSize="15sp"
-            android:textStyle="bold"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:paddingLeft="20dp"
             android:paddingTop="20dp"
             android:paddingBottom="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="05: 00"/>
+            android:text="05: 00"
+            android:textSize="15sp"
+            android:textStyle="bold" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:gravity="center_vertical"
                 android:id="@+id/source"
-                android:hint="Source"
-                android:textSize="15sp"
-                android:background="#FFF"
-                android:paddingLeft="40dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:focusedByDefault="false"/>
+                android:background="#FFF"
+                android:focusedByDefault="false"
+                android:gravity="center_vertical"
+                android:hint="Source"
+                android:paddingLeft="40dp"
+                android:paddingTop="5dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="5dp"
+                android:textSize="15sp" />
 
             <View
-                android:layout_marginLeft="20dp"
-                android:layout_centerVertical="true"
                 android:layout_width="7dp"
                 android:layout_height="7dp"
-                android:background="#00FF00"/>
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:background="#00FF00" />
 
         </RelativeLayout>
 
 
-
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <TextView
-                android:gravity="center_vertical"
                 android:id="@+id/destination"
-                android:hint="Destination"
-                android:textSize="15sp"
-                android:background="#FFF"
-                android:paddingLeft="40dp"
-                android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
                 android:layout_width="match_parent"
-                android:layout_height="50dp" />
+                android:layout_height="50dp"
+                android:background="#FFF"
+                android:gravity="center_vertical"
+                android:hint="Destination"
+                android:paddingLeft="40dp"
+                android:paddingTop="5dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="5dp"
+                android:textSize="15sp" />
 
             <View
-                android:layout_marginLeft="20dp"
-                android:layout_centerVertical="true"
                 android:layout_width="7dp"
                 android:layout_height="7dp"
-                android:background="#FF0000"/>
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dp"
+                android:background="#FF0000" />
         </RelativeLayout>
 
     </LinearLayout>
 
     <ImageView
-        android:src="@drawable/ic_edit_black_24dp"
         android:id="@+id/edit_route"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_alignParentRight="true"
         android:layout_marginTop="20dp"
         android:layout_marginRight="@dimen/fab_margin"
-        android:layout_width="24dp"
-        android:layout_height="24dp" />
+        android:src="@drawable/ic_edit_black_24dp" />
 
 </RelativeLayout>

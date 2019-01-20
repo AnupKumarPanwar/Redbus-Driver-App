@@ -36,10 +36,10 @@ class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.MyViewHolder> {
         myViewHolder.source.setText(busRoutes.get(i).source);
         myViewHolder.destination.setText(busRoutes.get(i).destination);
         String[] departureTime = busRoutes.get(i).departureTime.split(":");
-        if (departureTime[0].length()==1) {
+        if (departureTime[0].length() == 1) {
             departureTime[0] = "0" + departureTime[0];
         }
-        if (departureTime[1].length()==1) {
+        if (departureTime[1].length() == 1) {
             departureTime[1] = "0" + departureTime[1];
         }
         myViewHolder.departureTime.setText(departureTime[0] + ":" + departureTime[1]);
@@ -75,6 +75,7 @@ class RoutesAdapter extends RecyclerView.Adapter<RoutesAdapter.MyViewHolder> {
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView source, destination, departureTime;
         ImageView editRoute;
+
         public MyViewHolder(View itemView) {
             super(itemView);
             source = itemView.findViewById(R.id.source);

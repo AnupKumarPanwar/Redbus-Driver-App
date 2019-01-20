@@ -45,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        if(sharedPreferences.getString("access_token", null)!=null) {
+        if (sharedPreferences.getString("access_token", null) != null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
             finish();
