@@ -1,5 +1,6 @@
 package com.gotobus;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -61,6 +62,7 @@ public class AddRouteActivity extends AppCompatActivity {
 
     String waypoints = "";
     String waypointsLatLong = "";
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +72,13 @@ public class AddRouteActivity extends AppCompatActivity {
         baseUrl = getResources().getString(R.string.base_url);
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         accessToken = sharedPreferences.getString("access_token", null);
+
+        progressDialog=new ProgressDialog(this);
+        progressDialog.setMessage("Fetching routes...");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setProgress(0);
+        progressDialog.setCancelable(false);
 
         mItemArray = new ArrayList<>();
         DragListView mDragListView = (DragListView) findViewById(R.id.drag_list_view);
@@ -175,6 +184,8 @@ public class AddRouteActivity extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View view) {
+                progressDialog.setMessage("Saving route...");
+                progressDialog.show();
                 source = mItemArray.get(0).name;
                 destination = mItemArray.get(mItemArray.size()-1).name;
 //                sourceLatLong = mItemArray.get(0).latLong;
@@ -277,7 +288,8 @@ public class AddRouteActivity extends AppCompatActivity {
 
                                                         @Override
                                                         public void onError(ANError error) {
-//                                    Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                    progressDialog.hide();
                                                         }
                                                     });
                                         }
@@ -315,7 +327,8 @@ public class AddRouteActivity extends AppCompatActivity {
 
                                                         @Override
                                                         public void onError(ANError error) {
-//                                    Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                                            Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                                            progressDialog.hide();
                                                         }
                                                     });
                                         }
@@ -323,13 +336,15 @@ public class AddRouteActivity extends AppCompatActivity {
                                     }
 
                                 } catch (JSONException e) {
-                                    e.printStackTrace();
+                                    Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                    progressDialog.hide();
                                 }
                             }
 
                             @Override
                             public void onError(ANError error) {
-                                    Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(), error.getErrorBody(), Toast.LENGTH_LONG).show();
+                                progressDialog.hide();
                             }
                         });
 
