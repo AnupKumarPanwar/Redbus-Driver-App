@@ -89,6 +89,7 @@ public class SignupActivity extends AppCompatActivity {
                                         boolean success = Boolean.parseBoolean(result.get("success").toString());
                                         if (success) {
                                             Intent intent = new Intent(getApplicationContext(), OTPActivity.class);
+                                            intent.putExtra("phone", phone);
                                             startActivity(intent);
                                         } else {
                                             String message = result.get("message").toString();

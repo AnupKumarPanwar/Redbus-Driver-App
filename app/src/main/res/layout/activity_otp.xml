@@ -45,5 +45,15 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/resend_otp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:padding="30dp"
+        android:text="Resend OTP"
+        android:textColor="#1a0dab"
+        android:textSize="18sp" />
 
 </RelativeLayout>
