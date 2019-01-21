@@ -53,6 +53,13 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".OTPActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <receiver android:name=".UpdateLocationReceiver" >
+            <intent-filter>
+                <!-- Intent filters for broadcast receiver -->
+                <action android:name="android.location.PROVIDERS_CHANGED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

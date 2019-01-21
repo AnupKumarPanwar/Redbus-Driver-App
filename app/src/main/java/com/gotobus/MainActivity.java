@@ -1,5 +1,8 @@
 package com.gotobus;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -10,6 +13,7 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -80,6 +84,8 @@ public class MainActivity extends AppCompatActivity
 
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private CameraPosition mCameraPosition;
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
 
     // Keys for storing activity state.
     private static final String KEY_CAMERA_POSITION = "camera_position";
@@ -113,6 +119,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
         // Retrieve location and camera position from saved instance state.
         if (savedInstanceState != null) {
             mLastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -135,6 +143,16 @@ public class MainActivity extends AppCompatActivity
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         editor = sharedPreferences.edit();
         accessToken = sharedPreferences.getString("access_token", null);
+
+        alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(this, UpdateLocationReceiver.class);
+        Bundle locationBundle = new Bundle();
+        locationBundle.putString("baseUrl", baseUrl);
+        locationBundle.putString("Authorization", accessToken);
+        intent.putExtras(locationBundle);
+        alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
 
         AndroidNetworking.initialize(getApplicationContext());
 
@@ -168,13 +186,17 @@ public class MainActivity extends AppCompatActivity
                     fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_black_24dp));
                     nextPassengerContainer.setVisibility(View.VISIBLE);
                     tripStarted = true;
-                    handler.postDelayed(updateBusLocationRunnable, 12000);
+                    alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            SystemClock.elapsedRealtime() ,
+                            60 * 1000*2, alarmIntent);
+                   // handler.postDelayed(updateBusLocationRunnable, 12000);
                 } else {
                     Snackbar.make(view, "Trip completed", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                     fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
                     nextPassengerContainer.setVisibility(View.GONE);
                     tripStarted = false;
+                    alarmMgr.cancel(alarmIntent);
                     handler.removeCallbacksAndMessages(null);
                 }
             }
@@ -212,6 +234,7 @@ public class MainActivity extends AppCompatActivity
         } catch (SecurityException e) {
             Log.e("Exception: %s", e.getMessage());
         }
+
 
         AndroidNetworking.post(baseUrl + "/updateLatLong.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
