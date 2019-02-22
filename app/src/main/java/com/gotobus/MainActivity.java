@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity
     LinearLayout container, nextPassengerContainer;
 
     boolean tripStarted = false;
+    FloatingActionButton fab;
 
     int routeId = -1;
     String baseUrl;
@@ -118,7 +119,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
 
         // Retrieve location and camera position from saved instance state.
@@ -176,32 +176,21 @@ public class MainActivity extends AppCompatActivity
         };
 
 
-        final FloatingActionButton fab = findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!tripStarted) {
-                    Snackbar.make(view, "Trip started", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_black_24dp));
-                    nextPassengerContainer.setVisibility(View.VISIBLE);
-                    tripStarted = true;
-                    alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                            SystemClock.elapsedRealtime() ,
-                            60 * 1000*2, alarmIntent);
-                   // handler.postDelayed(updateBusLocationRunnable, 12000);
+                    startTrip();
+                    // handler.postDelayed(updateBusLocationRunnable, 12000);
                 } else {
-                    Snackbar.make(view, "Trip completed", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                    fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
-                    nextPassengerContainer.setVisibility(View.GONE);
-                    tripStarted = false;
-                    alarmMgr.cancel(alarmIntent);
-                    handler.removeCallbacksAndMessages(null);
+                    endTrip();
                 }
             }
         });
 
+
+        checkActiveTrip();
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -212,6 +201,62 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    public void startTrip() {
+        Snackbar.make(getCurrentFocus(), "Trip started", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_black_24dp));
+        nextPassengerContainer.setVisibility(View.VISIBLE);
+        tripStarted = true;
+        alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime(),
+                60 * 1000 * 2, alarmIntent);
+    }
+
+    public void endTrip() {
+        Snackbar.make(getCurrentFocus(), "Trip completed", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show();
+        fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
+        nextPassengerContainer.setVisibility(View.GONE);
+        tripStarted = false;
+        alarmMgr.cancel(alarmIntent);
+        handler.removeCallbacksAndMessages(null);
+    }
+
+    private void checkActiveTrip() {
+        AndroidNetworking.post(baseUrl + "/getActiveTrip.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                int routeId = Integer.parseInt(result.getJSONObject("data").get("route_id").toString());
+                                buildRoute(routeId);
+                                sourceAddress.setEnabled(false);
+                                destinationAddress.setEnabled(false);
+                                startTrip();
+                            } else {
+                                sourceAddress.setEnabled(true);
+                                destinationAddress.setEnabled(true);
+                                endTrip();
+                            }
+                        } catch (Exception e) {
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+
+                    }
+                });
     }
 
     private void updateBusLocation() {
@@ -239,7 +284,7 @@ public class MainActivity extends AppCompatActivity
         AndroidNetworking.post(baseUrl + "/updateLatLong.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
                 .addHeaders("Authorization", accessToken)
-                .addBodyParameter("last_location", String.valueOf(mLastKnownLocation.getLatitude())+","+String.valueOf(mLastKnownLocation.getLongitude()))
+                .addBodyParameter("last_location", String.valueOf(mLastKnownLocation.getLatitude()) + "," + String.valueOf(mLastKnownLocation.getLongitude()))
                 .addBodyParameter("bearing", String.valueOf(mLastKnownLocation.getBearing()))
                 .setPriority(Priority.MEDIUM)
                 .build()
@@ -308,16 +353,6 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.routes) {
             Intent intent = new Intent(getApplicationContext(), RoutesActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -339,75 +374,78 @@ public class MainActivity extends AppCompatActivity
 
         if (getIntent().getExtras() != null) {
             routeId = getIntent().getExtras().getInt("route_id", -1);
-        }
-
-        if (routeId != -1) {
-            AndroidNetworking.post(baseUrl + "/getRoute.php")
-                    .setOkHttpClient(NetworkCookies.okHttpClient)
-                    .addHeaders("Authorization", accessToken)
-                    .addBodyParameter("route_id", String.valueOf(routeId))
-                    .setPriority(Priority.MEDIUM)
-                    .build()
-                    .getAsJSONObject(new JSONObjectRequestListener() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                JSONObject result = response.getJSONObject("result");
-                                boolean success = Boolean.parseBoolean(result.get("success").toString());
-                                if (success) {
-                                    JSONObject data = result.getJSONObject("data");
-                                    sourceAddress.setText(data.get("source").toString());
-                                    destinationAddress.setText(data.get("destination").toString());
-
-                                    String[] sourceLatLong = data.get("sourceLatLong").toString().split(",");
-                                    String[] destinationLatLong = data.get("destinationLatLong").toString().split(",");
-                                    LatLng origin = new LatLng(Double.parseDouble(sourceLatLong[0]), Double.parseDouble(sourceLatLong[1]));
-                                    LatLng destination = new LatLng(Double.parseDouble(destinationLatLong[0]), Double.parseDouble(destinationLatLong[1]));
-                                    String waypoints = data.get("waypoints").toString();
-
-                                    sourceMarkerOption = new MarkerOptions()
-                                            .position(origin)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
-                                    mMap.addMarker(sourceMarkerOption);
-
-                                    destinationMarkerOption = new MarkerOptions()
-                                            .position(destination)
-                                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
-                                    mMap.addMarker(destinationMarkerOption);
-
-                                    String url = getDirectionsUrl(origin, destination, waypoints);
-
-                                    DownloadTask downloadTask = new DownloadTask();
-
-                                    // Start downloading json data from Google Directions API
-                                    downloadTask.execute(url);
-                                } else {
-                                    String message = result.get("message").toString();
-                                    if (message.equals("Invalid access token.")) {
-                                        editor.putString("access_token", null);
-                                        editor.commit();
-                                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    }
-                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-                                }
-                            } catch (Exception e) {
-                                Log.d("onResponse", e.getMessage());
-                            }
-                        }
-
-
-                        @Override
-                        public void onError(ANError anError) {
-
-                        }
-                    });
+            if (routeId != -1) {
+                buildRoute(routeId);
+            }
         }
 //        // Add a marker in Sydney and move the camera
 //        LatLng sydney = new LatLng(-34, 151);
 //        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    public void buildRoute(int routeId) {
+        AndroidNetworking.post(baseUrl + "/getRoute.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("route_id", String.valueOf(routeId))
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                JSONObject data = result.getJSONObject("data");
+                                sourceAddress.setText(data.get("source").toString());
+                                destinationAddress.setText(data.get("destination").toString());
+
+                                String[] sourceLatLong = data.get("sourceLatLong").toString().split(",");
+                                String[] destinationLatLong = data.get("destinationLatLong").toString().split(",");
+                                LatLng origin = new LatLng(Double.parseDouble(sourceLatLong[0]), Double.parseDouble(sourceLatLong[1]));
+                                LatLng destination = new LatLng(Double.parseDouble(destinationLatLong[0]), Double.parseDouble(destinationLatLong[1]));
+                                String waypoints = data.get("waypoints").toString();
+
+                                sourceMarkerOption = new MarkerOptions()
+                                        .position(origin)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.source_pin));
+                                mMap.addMarker(sourceMarkerOption);
+
+                                destinationMarkerOption = new MarkerOptions()
+                                        .position(destination)
+                                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.destination_pin));
+                                mMap.addMarker(destinationMarkerOption);
+
+                                String url = getDirectionsUrl(origin, destination, waypoints);
+
+                                DownloadTask downloadTask = new DownloadTask();
+
+                                // Start downloading json data from Google Directions API
+                                downloadTask.execute(url);
+                            } else {
+                                String message = result.get("message").toString();
+                                if (message.equals("Invalid access token.")) {
+                                    editor.putString("access_token", null);
+                                    editor.commit();
+                                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                            }
+                        } catch (Exception e) {
+                            Log.d("onResponse", e.getMessage());
+                        }
+                    }
+
+
+                    @Override
+                    public void onError(ANError anError) {
+
+                    }
+                });
     }
 
     private void getLocationPermission() {

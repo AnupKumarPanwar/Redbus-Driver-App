@@ -43,17 +43,20 @@
         <activity
             android:name=".LoginActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".SignupActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".OTPActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".SplashActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <receiver android:name=".UpdateLocationReceiver" >
             <intent-filter>
                 <!-- Intent filters for broadcast receiver -->
