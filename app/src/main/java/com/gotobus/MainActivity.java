@@ -52,11 +52,13 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -112,6 +114,8 @@ public class MainActivity extends AppCompatActivity
     Handler handler;
     Runnable updateBusLocationRunnable;
 
+    ArrayList<Passenger> passengers;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,6 +150,8 @@ public class MainActivity extends AppCompatActivity
 
         alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+        passengers = new ArrayList<>();
+
         Intent intent = new Intent(this, UpdateLocationReceiver.class);
         Bundle locationBundle = new Bundle();
         locationBundle.putString("baseUrl", baseUrl);
@@ -168,7 +174,8 @@ public class MainActivity extends AppCompatActivity
         updateBusLocationRunnable = new Runnable() {
             @Override
             public void run() {
-                updateBusLocation();
+//                updateBusLocation();
+                getBookings();
                 if (tripStarted) {
                     handler.postDelayed(this, 12000);
                 }
@@ -182,7 +189,6 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 if (!tripStarted) {
                     startTrip();
-                    // handler.postDelayed(updateBusLocationRunnable, 12000);
                 } else {
                     endTrip();
                 }
@@ -203,6 +209,54 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    private void getBookings() {
+        AndroidNetworking.post(baseUrl + "/getBookings.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                JSONArray data = result.getJSONArray("data");
+                                for (Passenger passenger : passengers) {
+                                    passenger.pickupMarker.remove();
+                                    passenger.dropoffMarker.remove();
+                                }
+                                passengers.clear();
+                                for (int i = 0; i < data.length(); i++) {
+                                    String phone = data.getJSONObject(i).get("phone").toString();
+                                    String name = data.getJSONObject(i).get("name").toString();
+                                    String pickup_point = data.getJSONObject(i).get("pickup_point").toString();
+                                    String dropoff_point = data.getJSONObject(i).get("dropoff_point").toString();
+                                    String otp = data.getJSONObject(i).get("otp").toString();
+                                    String fare = data.getJSONObject(i).get("fare").toString();
+
+                                    passengers.add(new Passenger(phone, name, pickup_point, dropoff_point, otp, fare));
+                                }
+//                                Toast.makeText(getApplicationContext(), passengers.toString(), Toast.LENGTH_LONG).show();
+                                for (Passenger passenger : passengers) {
+                                    passenger.pickupMarker = mMap.addMarker(passenger.pickupMarkerOptions);
+                                    passenger.dropoffMarker = mMap.addMarker(passenger.dropoffMarkerOptions);
+                                }
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+
+                    }
+                });
+    }
+
     public void startTrip() {
         Snackbar.make(getCurrentFocus(), "Trip started", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
@@ -212,6 +266,7 @@ public class MainActivity extends AppCompatActivity
         alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime(),
                 60 * 1000 * 2, alarmIntent);
+        handler.postDelayed(updateBusLocationRunnable, 100);
     }
 
     public void endTrip() {
