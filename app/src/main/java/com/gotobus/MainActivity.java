@@ -10,12 +10,14 @@ import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -32,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
@@ -99,7 +102,7 @@ public class MainActivity extends AppCompatActivity
 
     EditText sourceAddress, destinationAddress;
 
-    LinearLayout container, nextPassengerContainer;
+    LinearLayout container, nextPassengerContainer, callPassenger;
 
     boolean tripStarted = false;
     FloatingActionButton fab;
@@ -115,6 +118,13 @@ public class MainActivity extends AppCompatActivity
     Runnable updateBusLocationRunnable;
 
     ArrayList<Passenger> passengers;
+
+    TextView passengerName, bookingInfo;
+
+    LinearLayout layoutBottomSheet;
+
+    BottomSheetBehavior sheetBehavior;
+
 
 
     @Override
@@ -165,10 +175,18 @@ public class MainActivity extends AppCompatActivity
         container = findViewById(R.id.container);
         container.requestFocus();
 
+        callPassenger = findViewById(R.id.call_passenger);
+        passengerName = findViewById(R.id.passenger_name);
+        bookingInfo = findViewById(R.id.booking_info);
+
         nextPassengerContainer = findViewById(R.id.next_passenger_container);
 
         sourceAddress = findViewById(R.id.source_address);
         destinationAddress = findViewById(R.id.destination_address);
+
+        layoutBottomSheet = findViewById(R.id.bottom_sheet);
+        sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
+        sheetBehavior.setHideable(false);
 
         handler = new Handler();
         updateBusLocationRunnable = new Runnable() {
@@ -235,8 +253,10 @@ public class MainActivity extends AppCompatActivity
                                     String dropoff_point = data.getJSONObject(i).get("dropoff_point").toString();
                                     String otp = data.getJSONObject(i).get("otp").toString();
                                     String fare = data.getJSONObject(i).get("fare").toString();
+                                    String age = data.getJSONObject(i).get("age").toString();
+                                    String gender = data.getJSONObject(i).get("gender").toString();
 
-                                    passengers.add(new Passenger(phone, name, pickup_point, dropoff_point, otp, fare));
+                                    passengers.add(new Passenger(phone, name, pickup_point, dropoff_point, otp, fare, gender, age));
                                 }
 //                                Toast.makeText(getApplicationContext(), passengers.toString(), Toast.LENGTH_LONG).show();
                                 for (Passenger passenger : passengers) {
@@ -252,6 +272,7 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onError(ANError anError) {
+                        Toast.makeText(getApplicationContext(), anError.getMessage(), Toast.LENGTH_LONG).show();
 
                     }
                 });
@@ -261,7 +282,10 @@ public class MainActivity extends AppCompatActivity
         Snackbar.make(getCurrentFocus(), "Trip started", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_stop_black_24dp));
-        nextPassengerContainer.setVisibility(View.VISIBLE);
+//        nextPassengerContainer.setVisibility(View.VISIBLE);
+//        sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+
         tripStarted = true;
         alarmMgr.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                 SystemClock.elapsedRealtime(),
@@ -273,7 +297,9 @@ public class MainActivity extends AppCompatActivity
         Snackbar.make(getCurrentFocus(), "Trip completed", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show();
         fab.setImageDrawable(getResources().getDrawable(R.drawable.ic_play_arrow_black_24dp));
-        nextPassengerContainer.setVisibility(View.GONE);
+//        nextPassengerContainer.setVisibility(View.GONE);
+        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
         tripStarted = false;
         alarmMgr.cancel(alarmIntent);
         handler.removeCallbacksAndMessages(null);
@@ -542,6 +568,27 @@ public class MainActivity extends AppCompatActivity
             if (mLocationPermissionGranted) {
                 mMap.setMyLocationEnabled(true);
                 mMap.getUiSettings().setMyLocationButtonEnabled(true);
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        for (final Passenger passenger : passengers) {
+                            if (marker.equals(passenger.pickupMarker)) {
+                                callPassenger.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                                        intent.setData(Uri.parse("tel:"+passenger.phone));
+                                        startActivity(intent);
+                                    }
+                                });
+                                passengerName.setText(passenger.name);
+                                bookingInfo.setText("Rs. " + passenger.fare + "\t" + passenger.gender + " \t" + passenger.age + " years");
+                                break;
+                            }
+                        }
+                        return false;
+                    }
+                });
 
 //                mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
 //                    @Override
