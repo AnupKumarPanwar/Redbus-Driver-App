@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -55,6 +56,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -124,7 +126,9 @@ public class MainActivity extends AppCompatActivity
     LinearLayout layoutBottomSheet;
 
     BottomSheetBehavior sheetBehavior;
-
+    EditText otpInput;
+    Button pickupButton, dropOffButton;
+    Passenger selectedPassenger;
 
 
     @Override
@@ -159,6 +163,10 @@ public class MainActivity extends AppCompatActivity
         accessToken = sharedPreferences.getString("access_token", null);
 
         alarmMgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        otpInput = findViewById(R.id.otp);
+        pickupButton = findViewById(R.id.pickup_button);
+        dropOffButton = findViewById(R.id.dropoff_button);
 
         passengers = new ArrayList<>();
 
@@ -200,6 +208,31 @@ public class MainActivity extends AppCompatActivity
             }
         };
 
+        pickupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    String bookingId = selectedPassenger.bookingId;
+                    String otp = otpInput.getText().toString();
+                    pickupPassenger(bookingId, otp);
+                } catch (Exception e) {
+//                    Do nothing
+                }
+            }
+        });
+
+        dropOffButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    String bookingId = selectedPassenger.bookingId;
+                    dropoffPassenger(bookingId);
+                } catch (Exception e) {
+//                    Do nothing
+                }
+            }
+        });
+
 
         fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -227,6 +260,87 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    private void dropoffPassenger(final String bookingId) {
+        AndroidNetworking.post(baseUrl + "/dropoffPassenger.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("bookingId", bookingId)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                                for (Passenger passenger : passengers) {
+                                    if (passenger.bookingId.equals(bookingId)) {
+                                        passenger.pickupMarker.remove();
+                                        passenger.dropoffMarker.remove();
+                                        break;
+                                    }
+                                }
+                            } else {
+                                String message = result.get("message").toString();
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Toast.makeText(getApplicationContext(), anError.getMessage(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+    }
+
+    private void pickupPassenger(final String bookingId, String otp) {
+        AndroidNetworking.post(baseUrl + "/pickupPassenger.php")
+                .setOkHttpClient(NetworkCookies.okHttpClient)
+                .addHeaders("Authorization", accessToken)
+                .addBodyParameter("bookingId", bookingId)
+                .addBodyParameter("otp", otp)
+                .setPriority(Priority.MEDIUM)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONObject result = response.getJSONObject("result");
+                            boolean success = Boolean.parseBoolean(result.get("success").toString());
+                            if (success) {
+                                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                                for (Passenger passenger : passengers) {
+                                    if (passenger.bookingId.equals(bookingId)) {
+                                        passenger.pickupMarker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.pickedup_marker));
+                                        break;
+                                    }
+                                }
+                            } else {
+                                String message = result.get("message").toString();
+                                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(ANError anError) {
+                        Toast.makeText(getApplicationContext(), anError.getMessage(), Toast.LENGTH_LONG).show();
+
+                    }
+                });
+    }
+
+
     private void getBookings() {
         AndroidNetworking.post(baseUrl + "/getBookings.php")
                 .setOkHttpClient(NetworkCookies.okHttpClient)
@@ -247,6 +361,7 @@ public class MainActivity extends AppCompatActivity
                                 }
                                 passengers.clear();
                                 for (int i = 0; i < data.length(); i++) {
+                                    String bookingId = data.getJSONObject(i).get("bookingId").toString();
                                     String phone = data.getJSONObject(i).get("phone").toString();
                                     String name = data.getJSONObject(i).get("name").toString();
                                     String pickup_point = data.getJSONObject(i).get("pickup_point").toString();
@@ -255,8 +370,9 @@ public class MainActivity extends AppCompatActivity
                                     String fare = data.getJSONObject(i).get("fare").toString();
                                     String age = data.getJSONObject(i).get("age").toString();
                                     String gender = data.getJSONObject(i).get("gender").toString();
+                                    String status = data.getJSONObject(i).get("status").toString();
 
-                                    passengers.add(new Passenger(phone, name, pickup_point, dropoff_point, otp, fare, gender, age));
+                                    passengers.add(new Passenger(bookingId, phone, name, pickup_point, dropoff_point, otp, fare, gender, age, status));
                                 }
 //                                Toast.makeText(getApplicationContext(), passengers.toString(), Toast.LENGTH_LONG).show();
                                 for (Passenger passenger : passengers) {
@@ -444,7 +560,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-//        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.style_json));
+        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getApplicationContext(), R.raw.style_json));
 
         mMap.setBuildingsEnabled(true);
 
@@ -577,14 +693,48 @@ public class MainActivity extends AppCompatActivity
                                     @Override
                                     public void onClick(View v) {
                                         Intent intent = new Intent(Intent.ACTION_DIAL);
-                                        intent.setData(Uri.parse("tel:"+passenger.phone));
+                                        intent.setData(Uri.parse("tel:" + passenger.phone));
                                         startActivity(intent);
                                     }
                                 });
                                 passengerName.setText(passenger.name);
                                 bookingInfo.setText("Rs. " + passenger.fare + "\t" + passenger.gender + " \t" + passenger.age + " years");
+                                selectedPassenger = passenger;
+                                if (passenger.status.equals("BOOKED")) {
+                                    otpInput.setEnabled(true);
+                                    otpInput.setHint("Enter OTP");
+                                    otpInput.setVisibility(View.VISIBLE);
+                                    pickupButton.setVisibility(View.VISIBLE);
+                                    dropOffButton.setVisibility(View.GONE);
+                                }
+                                if (passenger.status.equals("PICKED")) {
+                                    otpInput.setEnabled(false);
+                                    otpInput.setText("Passenger already picked up.");
+                                    pickupButton.setVisibility(View.GONE);
+                                    dropOffButton.setVisibility(View.GONE);
+                                }
                                 break;
                             }
+
+                            if (marker.equals(passenger.dropoffMarker)) {
+                                callPassenger.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(Intent.ACTION_DIAL);
+                                        intent.setData(Uri.parse("tel:" + passenger.phone));
+                                        startActivity(intent);
+                                    }
+                                });
+                                passengerName.setText(passenger.name);
+                                bookingInfo.setText("Rs. " + passenger.fare + "\t" + passenger.gender + " \t" + passenger.age + " years");
+                                selectedPassenger = passenger;
+                                otpInput.setEnabled(false);
+                                otpInput.setText("Destination has arrived.");
+                                pickupButton.setVisibility(View.GONE);
+                                dropOffButton.setVisibility(View.VISIBLE);
+                                break;
+                            }
+
                         }
                         return false;
                     }

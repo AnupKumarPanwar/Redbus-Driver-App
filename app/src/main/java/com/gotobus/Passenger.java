@@ -6,12 +6,13 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class Passenger {
-    String phone, name, otp, fare, age, gender;
+    String bookingId, phone, name, otp, fare, age, gender, status;
     LatLng pickup_point, dropoff_point;
     MarkerOptions pickupMarkerOptions, dropoffMarkerOptions;
     Marker pickupMarker, dropoffMarker;
 
-    public Passenger(String phone, String name, String pickup_point, String dropoff_point, String otp, String fare, String gender, String age) {
+    public Passenger(String bookingId, String phone, String name, String pickup_point, String dropoff_point, String otp, String fare, String gender, String age, String status) {
+        this.bookingId = bookingId;
         this.phone = phone;
         this.name = name;
         this.gender = gender;
@@ -22,10 +23,19 @@ public class Passenger {
         this.dropoff_point = new LatLng(Double.parseDouble(dp[0]), Double.parseDouble(dp[1]));
         this.otp = otp;
         this.fare = fare;
-        pickupMarkerOptions = new MarkerOptions()
-                .position(this.pickup_point)
-                .title(name)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.pickup_marker));
+        this.status = status;
+
+        if (status.equals("PICKED")) {
+            pickupMarkerOptions = new MarkerOptions()
+                    .position(this.pickup_point)
+                    .title(name)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pickedup_marker));
+        } else {
+            pickupMarkerOptions = new MarkerOptions()
+                    .position(this.pickup_point)
+                    .title(name)
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.pickup_marker));
+        }
 
         dropoffMarkerOptions = new MarkerOptions()
                 .position(this.dropoff_point)
